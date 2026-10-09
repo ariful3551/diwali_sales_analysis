@@ -20,7 +20,7 @@ Source: [Diwali Sales Dataset on Kaggle](https://www.kaggle.com/datasets/bharath
 - **Columns:** 15
 - **File encoding:** not UTF-8, load with `encoding="latin-1"`
 
-### Columns
+### Columns (raw file)
 
 | Column | Description |
 |---|---|
@@ -44,10 +44,11 @@ Source: [Diwali Sales Dataset on Kaggle](https://www.kaggle.com/datasets/bharath
 
 - `Amount` has **12 missing values**.
 - `Status` and `unnamed1` are **completely empty**.
+- There are **8 fully duplicated rows**.
 - 11,251 rows but only 3,755 unique `User_ID`s, so customers appear in multiple rows (repeat purchases).
 - `Age` goes up to 92, to be checked against `Age Group` before deciding.
 - Some columns need to be renamed.
-- There are incorrect data types in some places.
+- Some columns have incorrect data types.
 
 ## Project Structure
 
@@ -64,7 +65,16 @@ images/
 
 ## Cleaning Steps
 
-*Coming next.*
+Cleaning is done in `notebooks/02_data_cleaning.ipynb` on a copy of the raw data (the raw file stays untouched).
+
+- [x] Dropped the empty columns `Status` and `unnamed1` (13 columns remain)
+- [x] Renamed `Cust_name` to `Customer_Name` and `Age Group` to `Age_Group`
+- [ ] Remove rows with missing `Amount`
+- [ ] Fix data types (`Amount`, `Age_Group`)
+- [ ] Decide what to do with duplicate rows
+- [ ] Check unusual characters in `State`
+- [ ] Check `Age` against `Age_Group`
+- [ ] Save cleaned dataset to `data/cleaned/`
 
 ## Key Findings
 
