@@ -69,8 +69,8 @@ Cleaning is done in `notebooks/02_data_cleaning.ipynb` on a copy of the raw data
 
 - [x] Dropped the empty columns `Status` and `unnamed1` (13 columns remain)
 - [x] Renamed `Cust_name` to `Customer_Name` and `Age Group` to `Age_Group`
-- [ ] Remove rows with missing `Amount`
-- [ ] Fix data types (`Amount`, `Age_Group`)
+- [x] Remove rows with missing `Amount`
+- [x] Fix data types (`Amount`, `Age_Group`)
 - [ ] Decide what to do with duplicate rows
 - [ ] Check unusual characters in `State`
 - [ ] Check `Age` against `Age_Group`
