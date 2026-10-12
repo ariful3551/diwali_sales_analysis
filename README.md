@@ -2,7 +2,7 @@
 
 Exploratory data analysis of Diwali sales data using Python (pandas, matplotlib).
 
-> 🚧 Work in progress. Updated step by step.
+> 🚧 Work in progress. Data cleaning is complete, exploratory analysis is next.
 
 ## Business Questions
 
@@ -16,39 +16,57 @@ Exploratory data analysis of Diwali sales data using Python (pandas, matplotlib)
 
 Source: [Diwali Sales Dataset on Kaggle](https://www.kaggle.com/datasets/bharathid8/diwali-sales-dataset) (by bharathid8).
 
-- **Rows:** 11,251
-- **Columns:** 15
-- **File encoding:** not UTF-8, load with `encoding="latin-1"`
+- **Raw file:** 11,251 rows, 15 columns
+- **File encoding:** not UTF-8, load the raw file with `encoding="latin-1"`
+- **Cleaned file:** 11,239 rows, 13 columns (UTF-8)
 
-### Columns (raw file)
+### Columns
 
-| Column | Description |
-|---|---|
-| User_ID | Customer identifier |
-| Cust_name | Customer name |
-| Product_ID | Product identifier |
-| Gender | Customer gender |
-| Age Group | Age bracket |
-| Age | Customer age |
-| Marital_Status | 0/1 flag |
-| State | Customer state |
-| Zone | Region |
-| Occupation | Customer occupation |
-| Product_Category | Category of the product |
-| Orders | Number of orders |
-| Amount | Purchase amount |
-| Status | Empty column |
-| unnamed1 | Empty column |
+| Column (raw) | Column (cleaned) | Description |
+|---|---|---|
+| User_ID | User_ID | Customer identifier |
+| Cust_name | Customer_Name | Customer name |
+| Product_ID | Product_ID | Product identifier |
+| Gender | Gender | Customer gender (M/F) |
+| Age Group | Age_Group | Age bracket |
+| Age | Age | Customer age |
+| Marital_Status | Marital_Status | 0/1 flag |
+| State | State | Customer state |
+| Zone | Zone | Region |
+| Occupation | Occupation | Customer occupation |
+| Product_Category | Product_Category | Category of the product |
+| Orders | Orders | Number of orders |
+| Amount | Amount | Purchase amount |
+| Status | *(removed)* | Completely empty |
+| unnamed1 | *(removed)* | Completely empty |
 
 ## Data Understanding
 
+Notebook: [`01_data_understanding.ipynb`](notebooks/01_data_understanding.ipynb)
+
 - `Amount` has **12 missing values**.
 - `Status` and `unnamed1` are **completely empty**.
-- There are **8 fully duplicated rows**.
-- 11,251 rows but only 3,755 unique `User_ID`s, so customers appear in multiple rows (repeat purchases).
-- `Age` goes up to 92, to be checked against `Age Group` before deciding.
-- Some columns need to be renamed.
+- `Age` goes up to 92.
 - Some columns have incorrect data types.
+- Some columns need to be renamed.
+
+## Data Cleaning
+
+Notebook: [`02_data_cleaning.ipynb`](notebooks/02_data_cleaning.ipynb). All cleaning is done on a copy, the raw file is never edited.
+
+| Step | Action | Rows after |
+|---|---|---|
+| 1 | Dropped the empty columns `Status` and `unnamed1` | 11,251 |
+| 2 | Renamed `Cust_name` to `Customer_Name` and `Age Group` to `Age_Group` | 11,251 |
+| 3 | Removed 12 rows with missing `Amount` (0.1% of the data) | 11,239 |
+| 4 | Converted `Age_Group` to category and `Amount` to int (5 values with decimals were rounded) | 11,239 |
+| 5 | Checked `Age` against `Age_Group` (see below) | 11,239 |
+| 6 | Saved the cleaned dataset to `data/cleaned/diwali_sales_cleaned.csv` | 11,239 |
+
+### Age check
+
+- **Age 92 is valid.** It is consistent with the `55+` group, and 136 rows have an age above 80, all in `55+`.
+- **22 rows are inconsistent.** They have `Age` 26 but `Age_Group` 36-45. The correct value is unknown, so they are kept (0.2% of the data). The analysis uses `Age_Group`.
 
 ## Project Structure
 
@@ -63,18 +81,18 @@ notebooks/
 images/
 ```
 
-## Cleaning Steps
+## How to Load the Data
 
-Cleaning is done in `notebooks/02_data_cleaning.ipynb` on a copy of the raw data (the raw file stays untouched).
+```python
+import pandas as pd
 
-- [x] Dropped the empty columns `Status` and `unnamed1` (13 columns remain)
-- [x] Renamed `Cust_name` to `Customer_Name` and `Age Group` to `Age_Group`
-- [x] Remove rows with missing `Amount`
-- [x] Fix data types (`Amount`, `Age_Group`)
-- [ ] Decide what to do with duplicate rows
-- [ ] Check unusual characters in `State`
-- [ ] Check `Age` against `Age_Group`
-- [ ] Save cleaned dataset to `data/cleaned/`
+# Cleaned data (UTF-8)
+df = pd.read_csv("data/cleaned/diwali_sales_cleaned.csv")
+df["Age_Group"] = df["Age_Group"].astype("category")  # category is lost when saving to CSV
+
+# Raw data (not UTF-8)
+raw = pd.read_csv("data/raw/diwali_sales_data.csv", encoding="latin-1")
+```
 
 ## Key Findings
 
@@ -84,3 +102,5 @@ Cleaning is done in `notebooks/02_data_cleaning.ipynb` on a copy of the raw data
 
 - The dataset has no date column, so time-based trends cannot be analyzed.
 - Data covers the Diwali period only, so findings should not be generalized to the whole year.
+- There is no Order ID, so exact duplicate rows could not be verified as errors or genuine repeat purchases.
+- 22 rows have an Age that does not match the Age_Group (kept as is).
