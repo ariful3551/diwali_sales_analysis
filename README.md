@@ -2,13 +2,13 @@
 
 Exploratory data analysis of Diwali sales data using Python (pandas, matplotlib).
 
-> 🚧 Work in progress. Data cleaning is complete, exploratory analysis is in progress (Q2 of 5 done).
+> 🚧 Work in progress. Data cleaning is complete, exploratory analysis is in progress (Q3 of 5 done).
 
 ## Business Questions
 
 - [x] 1. **Product:** Which Product_Category generates the most revenue, and what share of total revenue does each category contribute?
 - [x] 2. **Location:** Which States and Zones generate the highest and lowest revenue?
-- [ ] 3. **Customer segments:** Which segment (Gender + Age Group + Marital_Status) spends the most, and which spends the least?
+- [x] 3. **Customer segments:** Which segment (Gender + Age Group + Marital_Status) spends the most, and which spends the least?
 - [ ] 4. **Customer concentration:** What percentage of total revenue comes from the top 10% of customers?
 - [ ] 5. **Recommendation:** Which categories, States and segments should receive more marketing budget, and why?
 
@@ -30,7 +30,7 @@ Source: [Diwali Sales Dataset on Kaggle](https://www.kaggle.com/datasets/bharath
 | Gender | Gender | Customer gender (M/F) |
 | Age Group | Age_Group | Age bracket |
 | Age | Age | Customer age |
-| Marital_Status | Marital_Status | 0/1 flag |
+| Marital_Status | Marital_Status | 0/1 flag (meaning not stated in the dataset) |
 | State | State | Customer state |
 | Zone | Zone | Region |
 | Occupation | Occupation | Customer occupation |
@@ -68,6 +68,10 @@ Notebook: [`02_data_cleaning.ipynb`](notebooks/02_data_cleaning.ipynb). All clea
 - **Age 92 is valid.** It is consistent with the `55+` group, and 136 rows have an age above 80, all in `55+`.
 - **22 rows are inconsistent.** They have `Age` 26 but `Age_Group` 36-45. The correct value is unknown, so they are kept (0.2% of the data). The analysis uses `Age_Group`.
 
+### Known issues left as is
+
+- **8 exact duplicate rows are kept.** There is no Order ID, so they cannot be confirmed as errors or as genuine repeat purchases. They add up to 70,304 in `Amount` (0.07% of total revenue).
+- **`State` has a non-breaking space in "Andhra Pradesh".** It does not affect grouping, but filtering by the name typed with a normal space will not match.
 
 ## Exploratory Analysis
 
@@ -120,6 +124,46 @@ Notebook: [`03_eda_and_visualization.ipynb`](notebooks/03_eda_and_visualization.
 - The highest State (Uttar Pradesh) earns about 16.8 times more than the lowest (Telangana).
 - **Recommendation:** prioritize inventory and marketing budget on the top States and the Central zone, and review the Eastern zone separately to decide whether to grow it or limit spending there. This shows where sales are small, not why, since larger States naturally earn more.
 
+### Q3. Which customer segments spend the most?
+
+![Revenue by Age Group](images/q3_revenue_by_age_group.png)
+
+![Top 10 customer segments by revenue](images/q3_top_segments.png)
+
+| Gender | Revenue | Share of total | Avg per purchase |
+|---|---|---|---|
+| F | 74,335,856 | 70.0% | 9,491 |
+| M | 31,913,276 | 30.0% | 9,367 |
+
+| Age group | Revenue | Share of total | Avg per purchase |
+|---|---|---|---|
+| 0-17 | 2,699,653 | 2.5% | 9,120 |
+| 18-25 | 17,240,732 | 16.2% | 9,175 |
+| 26-35 | 42,613,443 | 40.1% | 9,384 |
+| 36-45 | 22,144,996 | 20.8% | 9,700 |
+| 46-50 | 9,207,844 | 8.7% | 9,367 |
+| 51-55 | 8,261,477 | 7.8% | 9,954 |
+| 55+ | 4,080,987 | 3.8% | 9,557 |
+
+| Marital_Status | Revenue | Share of total | Avg per purchase |
+|---|---|---|---|
+| 0 | 62,125,386 | 58.5% | 9,531 |
+| 1 | 44,123,746 | 41.5% | 9,346 |
+
+| Top segments (Gender, Age group, Marital_Status) | Revenue | Share of total |
+|---|---|---|
+| F, 26-35, 0 | 18,222,379 | 17.2% |
+| F, 26-35, 1 | 12,741,575 | 12.0% |
+| F, 36-45, 0 | 9,113,127 | 8.6% |
+| F, 18-25, 0 | 6,851,952 | 6.4% |
+| M, 26-35, 0 | 6,786,370 | 6.4% |
+
+- Women generate 70% of revenue, and customers aged 26-35 contribute 40.1%. The three groups between 18 and 45 together generate about 77%.
+- The best segment (women aged 26-35 with Marital_Status 0) alone generates 17.2% of revenue. The top 5 of the 28 segments generate about 50.6%.
+- The average spend per purchase is almost the same in every group (about 9,100 to 10,000). The differences in revenue come from how **often** customers buy, not from how much they spend each time.
+- **Recommendation:** focus marketing on women aged 26-45 and on campaigns that increase purchase frequency (bundles, repeat offers), rather than premium pricing. Older groups (51-55, 36-45) spend slightly more per purchase and could be tested with premium offers.
+- **Notes:** the meaning of Marital_Status 0 and 1 is not stated in the dataset. The smallest segments have only about 55 to 80 rows, so their figures are less reliable. Charts for Gender and Marital_Status are in the notebook.
+
 *More findings will be added as each question is answered.*
 
 ## Project Structure
@@ -154,4 +198,5 @@ raw = pd.read_csv("data/raw/diwali_sales_data.csv", encoding="latin-1")
 - Data covers the Diwali period only, so findings should not be generalized to the whole year.
 - There is no Order ID, so exact duplicate rows could not be verified as errors or genuine repeat purchases.
 - 22 rows have an Age that does not match the Age_Group (kept as is).
+- The meaning of `Marital_Status` (0 and 1) is not documented in the dataset.
 - Revenue figures are based on the `Amount` column of this dataset only.
