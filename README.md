@@ -2,15 +2,15 @@
 
 Exploratory data analysis of Diwali sales data using Python (pandas, matplotlib).
 
-> 🚧 Work in progress. Data cleaning is complete, exploratory analysis is in progress (Q3 of 5 done).
+> ✅ Analysis complete: data cleaning, all 5 business questions answered, final recommendation included.
 
 ## Business Questions
 
 - [x] 1. **Product:** Which Product_Category generates the most revenue, and what share of total revenue does each category contribute?
 - [x] 2. **Location:** Which States and Zones generate the highest and lowest revenue?
 - [x] 3. **Customer segments:** Which segment (Gender + Age Group + Marital_Status) spends the most, and which spends the least?
-- [ ] 4. **Customer concentration:** What percentage of total revenue comes from the top 10% of customers?
-- [ ] 5. **Recommendation:** Which categories, States and segments should receive more marketing budget, and why?
+- [x] 4. **Customer concentration:** What percentage of total revenue comes from the top 10% of customers?
+- [x] 5. **Recommendation:** Which categories, States and segments should receive more marketing budget, and why?
 
 ## Dataset
 
@@ -164,7 +164,49 @@ Notebook: [`03_eda_and_visualization.ipynb`](notebooks/03_eda_and_visualization.
 - **Recommendation:** focus marketing on women aged 26-45 and on campaigns that increase purchase frequency (bundles, repeat offers), rather than premium pricing. Older groups (51-55, 36-45) spend slightly more per purchase and could be tested with premium offers.
 - **Notes:** the meaning of Marital_Status 0 and 1 is not stated in the dataset. The smallest segments have only about 55 to 80 rows, so their figures are less reliable. Charts for Gender and Marital_Status are in the notebook.
 
-*More findings will be added as each question is answered.*
+### Q4. How much revenue comes from the top 10% of customers?
+
+![Revenue concentration by customer](images/q4_revenue_concentration.png)
+
+Customers are identified by `User_ID` (3,752 unique customers).
+
+| Top customers | Number of customers | Share of total revenue |
+|---|---|---|
+| Top 1% | 38 | 6.0% |
+| Top 5% | 188 | 20.6% |
+| Top 10% | 376 | 33.3% |
+| Top 20% | 751 | 51.3% |
+| Top 50% | 1,876 | 81.7% |
+
+| Group | Avg purchases | Avg revenue per customer |
+|---|---|---|
+| Top 10% | 9.2 | 94,177 |
+| Other 90% | 2.3 | 20,983 |
+
+- The top 10% of customers generate **33.3%** of revenue, and the top 20% generate **51.3%**.
+- The 80/20 rule does **not** apply: about 47.5% of customers are needed to reach 80% of revenue. Revenue is spread fairly widely and does not depend on a few very large buyers.
+- The top 10% buy about 9.2 times on average, against 2.3 for the rest, so buying frequency is what makes a customer valuable.
+- **37.3%** of customers (1,398) bought only once.
+- **Recommendation:** a loyalty or repeat-purchase program is likely to be more useful than protecting a few large accounts, and one-time buyers are the clearest opportunity to convert into repeat buyers.
+
+### Q5. Final recommendation: where should the marketing budget go?
+
+| Area | Where to focus | Evidence |
+|---|---|---|
+| Categories | Food, Clothing & Apparel, Electronics & Gadgets, Footwear & Shoes | About 76.8% of revenue, Food alone 31.9% |
+| Locations | Uttar Pradesh, Maharashtra, Karnataka, and the Central zone | Top 3 States 44.5% of revenue, Central zone 39.2% |
+| Customers | Women aged 26-45 | Women 70% of revenue, ages 18-45 about 77% |
+| Retention | Repeat-purchase offers for one-time buyers | 37.3% bought once, top 10% buy 9.2 times vs 2.3 |
+| Test only | Eastern zone and Telangana | Eastern zone 6.6%, Telangana 1.1% of revenue |
+
+Suggested priority:
+
+1. Put the largest share of the budget on the top 4 categories in the top 3 States, aimed at women aged 26-45.
+2. Run a repeat-purchase program (bundles, second-purchase offers), because spend per purchase is almost the same in every group and the difference comes from how often customers buy.
+3. Test the Eastern zone with a small budget before deciding to grow or reduce spending there.
+4. Give the smallest categories (each 0.4% or less) the least budget.
+
+**Caution:** this is based on revenue only. The dataset has no cost, profit or marketing-spend data, so return on investment cannot be calculated, and low revenue in a region shows where sales are small, not why.
 
 ## Project Structure
 
@@ -199,4 +241,5 @@ raw = pd.read_csv("data/raw/diwali_sales_data.csv", encoding="latin-1")
 - There is no Order ID, so exact duplicate rows could not be verified as errors or genuine repeat purchases.
 - 22 rows have an Age that does not match the Age_Group (kept as is).
 - The meaning of `Marital_Status` (0 and 1) is not documented in the dataset.
+- There is no cost, profit or marketing-spend data, so recommendations are based on revenue only.
 - Revenue figures are based on the `Amount` column of this dataset only.
